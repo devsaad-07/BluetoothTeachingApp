@@ -53,6 +53,19 @@ public class ShowMarks extends AppCompatActivity {
         final Firebase marksRef = mStudentRef.child("Marks");
 
 
+        mTeacherRef.child("no").addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                int value = dataSnapshot.getValue(Integer.class);
+                j = value;
+            }
+
+            @Override
+            public void onCancelled(FirebaseError firebaseError) {
+
+            }
+        });
+
         queRef.child("Question" + String.valueOf(i)).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {

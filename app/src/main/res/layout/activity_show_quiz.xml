@@ -6,32 +6,11 @@
     android:layout_height="match_parent"
     tools:context=".ShowQuiz">
 
-    <EditText
-        android:id="@+id/id"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
-        android:layout_centerVertical="true"
-        android:ems="10"
-        android:hint="ID"
-        android:inputType="textEmailAddress" />
-
-    <EditText
-        android:id="@+id/password"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/id"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="25dp"
-        android:ems="10"
-        android:hint="Password"
-        android:inputType="textPassword" />
-
     <Button
         android:id="@+id/nextButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/password"
+        android:layout_below="@+id/quizNo"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="25dp"
         android:text="next" />
@@ -40,9 +19,8 @@
         android:id="@+id/rollNo"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/id"
+        android:layout_centerInParent="true"
         android:layout_centerHorizontal="true"
-        android:layout_marginBottom="25dp"
         android:ems="10"
         android:hint="Roll No"
         android:inputType="textEmailAddress" />
@@ -51,10 +29,21 @@
         android:id="@+id/status"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
+        android:layout_above="@+id/rollNo"
         android:layout_centerHorizontal="true"
-        android:layout_marginBottom="497dp"
+        android:layout_marginBottom="80dp"
         android:text="Status"
         android:textSize="24sp" />
+
+    <EditText
+        android:id="@+id/quizNo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/rollNo"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="20dp"
+        android:ems="10"
+        android:hint="Quiz No"
+        android:inputType="textPersonName" />
 
 </RelativeLayout>

@@ -1,18 +1,20 @@
 package com.example.chat_prototype1;
 
 import android.bluetooth.BluetoothSocket;
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import com.firebase.client.DataSnapshot;
 import com.firebase.client.Firebase;
+import com.firebase.client.FirebaseError;
+import com.firebase.client.ValueEventListener;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -21,15 +23,17 @@ import java.io.OutputStream;
 public class TeacherFrag extends Fragment {
 
     ApplicationClass app;
-    EditText queText, aquizNo;
-    TextView ansView, textView, textView2;
+    EditText aquizNo;
+    TextView queText, ansView, textView, textView2;
     Button sendQue, endQuiz, nextButton;
     BluetoothSocket socket;
     SendReceive sendReceive;
     String rollNo, quizNo;
     private Firebase mRootRef;
-    private Firebase childRef;
-    int i;
+    private Firebase queRef;
+    private Firebase mTeacherRef;
+    private Firebase teachRef;
+    int i, j;
 
     public TeacherFrag() {
         // Required empty public constructor
@@ -40,7 +44,7 @@ public class TeacherFrag extends Fragment {
         super.onActivityCreated(savedInstanceState);
         socket = ((ApplicationClass)getActivity().getApplication()).mySocket();
         i = 1;
-        mRootRef = new Firebase("https://chat-prototype1-139d0.firebaseio.com/Quiz");
+        j=1;
         sendReceive = new SendReceive(socket);
         sendReceive.start();
     }
@@ -50,7 +54,7 @@ public class TeacherFrag extends Fragment {
                              final Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_teacher, container, false);
-        queText = (EditText) view.findViewById(R.id.queText);
+        queText = (TextView) view.findViewById(R.id.queText);
         ansView = (TextView) view.findViewById(R.id.ansView);
         sendQue = (Button) view.findViewById(R.id.sendQue);
         endQuiz = (Button) view.findViewById(R.id.endQuiz);
@@ -67,12 +71,12 @@ public class TeacherFrag extends Fragment {
         sendQue.setVisibility(View.INVISIBLE);
         textView2.setVisibility(View.INVISIBLE);
 
+        mRootRef = new Firebase("https://chat-prototype1-139d0.firebaseio.com/Quiz");
 
         nextButton.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
+            public void onClick(final View v) {
                 String string = String.valueOf(aquizNo.getText());
-                sendReceive.write(string.getBytes());
                 quizNo = string;
                 ((ApplicationClass)getActivity().getApplication()).setQuizNo(string);
                 nextButton.setVisibility(View.GONE);
@@ -84,6 +88,28 @@ public class TeacherFrag extends Fragment {
                 sendQue.setVisibility(View.VISIBLE);
                 textView2.setVisibility(View.VISIBLE);
                 textView.setText("Question " + String.valueOf(i));
+
+                String a = ((ApplicationClass)getActivity().getApplication()).getRollNo();
+                teachRef = new Firebase("https://chat-prototype1-139d0.firebaseio.com/Quiz/" + "Quiz" + quizNo + "/" + rollNo);
+                mTeacherRef = new Firebase("https://chat-prototype1-139d0.firebaseio.com/Quiz/" + "Quiz" + quizNo);
+                queRef = mTeacherRef.child("Questions");
+
+                final String[] que = new String[1];
+
+                queRef.child("Question" + String.valueOf(i)).addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        String value = dataSnapshot.getValue(String.class);
+                        que[0] = value;
+                        sendReceive.write(que[0].getBytes());
+                        queText.setText(que[0]);
+                        //Toast.makeText(getContext(), value ,Toast.LENGTH_LONG).show();
+                    }
+                    @Override
+                    public void onCancelled(FirebaseError firebaseError) {
+                    }
+                });
+                i++;
             }
         });
 
@@ -92,16 +118,23 @@ public class TeacherFrag extends Fragment {
             @Override
             public void onClick(View v) {
 
-                String string = String.valueOf(queText.getText());
-                //Toast.makeText(getContext(),"onClick",Toast.LENGTH_LONG).show();
-                sendReceive.write(string.getBytes());
+                final String[] que = new String[1];
 
-                childRef = mRootRef.child("Quiz" + quizNo);
-                Firebase QueRef = childRef.child("Questions");
-                Firebase a = QueRef.child("Question" + String.valueOf(i));
-                a.setValue(string);
-                i++;
+                queRef.child("Question" + String.valueOf(i)).addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        String value = dataSnapshot.getValue(String.class);
+                        que[0] = value;
+                        sendReceive.write(que[0].getBytes());
+                        queText.setText(que[0]);
+                    }
+                    @Override
+                    public void onCancelled(FirebaseError firebaseError) {
+
+                    }
+                });
                 textView.setText("Question " + String.valueOf(i));
+                i++;
             }
         });
 
@@ -112,7 +145,7 @@ public class TeacherFrag extends Fragment {
                 sendReceive.write(string.getBytes());
                 try {
                     socket.close();
-                    Firebase marksRef = childRef.child("no");
+                    Firebase marksRef = mTeacherRef.child("no");
                     marksRef.setValue(i-1);
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -159,6 +192,13 @@ public class TeacherFrag extends Fragment {
                     final String finalS = s;
                     if(rollNo == null){
                         rollNo = s;
+                        final String finalS1 = s;
+                        getActivity().runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                Toast.makeText(getContext(), finalS1,Toast.LENGTH_LONG).show();
+                            }
+                        });
                         ((ApplicationClass)getActivity().getApplication()).setRollNo(rollNo);
                     }
                     else {
@@ -166,6 +206,11 @@ public class TeacherFrag extends Fragment {
                         @Override
                         public void run() {
                             ansView.setText(finalS);
+                            Firebase AnsRef = teachRef.child("Answers");
+                            Firebase b = AnsRef.child("Answer" + String.valueOf(j));
+                            j++;
+                            b.setValue(finalS);
+
                         }
                     });}
                 } catch (IOException e) {

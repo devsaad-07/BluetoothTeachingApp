@@ -10,7 +10,7 @@ import android.widget.Button;
 public class MainActivity extends AppCompatActivity {
 
 
-    Button teacherButton, studentButton, showQuiz, checkQuiz, register;
+    Button teacherButton, studentButton, showQuiz, checkQuiz, register, createQuiz;
     final String TAG = "devsTag";
     ApplicationClass app;
 
@@ -27,6 +27,15 @@ public class MainActivity extends AppCompatActivity {
         showQuiz = (Button) findViewById(R.id.showQuiz);
         checkQuiz = (Button) findViewById(R.id.checkQuiz);
         register = (Button) findViewById(R.id.register);
+        createQuiz = (Button) findViewById(R.id.createQuiz);
+
+        createQuiz.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getApplicationContext(), CreateQuiz.class);
+                startActivity(intent);
+            }
+        });
 
         teacherButton.setOnClickListener(new View.OnClickListener() {
             @Override

@@ -29,7 +29,6 @@ public class StudentFrag extends Fragment {
     SendReceive sendReceive;
     String rollNo;
     String quizNo;
-    private Firebase mRootRef;
     int i;
     Boolean flag = false;
 
@@ -61,11 +60,9 @@ public class StudentFrag extends Fragment {
         nextButton = (Button) view.findViewById(R.id.nextButton);
         textView2 = (TextView) view.findViewById(R.id.textView2);
         i = 1;
+        textView.setText("Question " + String.valueOf(i));
 
         nextButton.setVisibility(View.INVISIBLE);
-
-
-        //Toast.makeText(getContext(),"roll no" + rollNo,Toast.LENGTH_LONG).show();
 
 
         nextButton.setOnClickListener(new View.OnClickListener() {
@@ -75,22 +72,18 @@ public class StudentFrag extends Fragment {
             }
         });
 
-
         sendAns.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String string = String.valueOf(ansText.getText());
-                //Toast.makeText(getContext(),"onClick",Toast.LENGTH_LONG).show();
-                sendReceive.write(string.getBytes());
-                Firebase childRef = mRootRef.child("Answers");
-                Firebase AnsRef = childRef.child("Answer" + String.valueOf(i));
-                AnsRef.setValue(string);
-                i++;
-                textView.setText("Question " + String.valueOf(i));
-            }
+
+                    String string = String.valueOf(ansText.getText());
+                    ansText.getText().clear();
+                    //Toast.makeText(getContext(),"onClick",Toast.LENGTH_LONG).show();
+                    sendReceive.write(string.getBytes());
+                    i++;
+                    textView.setText("Question " + String.valueOf(i));
+                }
         });
-
-
         return view;
     }
 
@@ -126,10 +119,8 @@ public class StudentFrag extends Fragment {
                     bytes = inputStream.read(buffer);
                     s = new String(buffer, 0, bytes);
                     final String finalS = s;
-                    if (quizNo == null) {
-                        quizNo = s;
-                        mRootRef = new Firebase("https://chat-prototype1-139d0.firebaseio.com/Quiz/" + "Quiz" + quizNo + "/" + rollNo);
-                    } else if (finalS.equals("end quiz")) {
+
+                    if (finalS.equals("end quiz")) {
                         getActivity().runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
